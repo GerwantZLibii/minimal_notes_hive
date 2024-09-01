@@ -66,11 +66,11 @@ class NoteViewPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => NotesPage(),
+                    builder: (context) => const NotesPage(),
                   ),
                 );
               },
-              icon: Icon(Icons.check))
+              icon: const Icon(Icons.check))
         ],
       ),
       body: Column(
