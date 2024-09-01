@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:minimal_notes_hive/components/drawer.dart';
+import 'package:minimal_notes_hive/components/note_list.dart';
 import 'package:minimal_notes_hive/components/note_tile.dart';
+import 'package:minimal_notes_hive/components/selection_mode_provider.dart';
 import 'package:minimal_notes_hive/models/note.dart';
 import 'package:minimal_notes_hive/models/note_database.dart';
 import 'package:minimal_notes_hive/pages/note_view_page.dart';
@@ -15,7 +17,6 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
-
   @override
   void initState() {
     super.initState();
@@ -64,12 +65,22 @@ class _NotesPageState extends State<NotesPage> {
     context.read<NoteDatabase>().deleteNote(id);
   }
 
+  void _deleteSelectedNotes() {
+    final noteDatabase = context.read<NoteDatabase>();
+    final selectedNotes = context.read<SelectionModeProvider>().selectedNotes;
+
+    selectedNotes.forEach((index) {
+      noteDatabase.deleteNote(noteDatabase.currentNotes[index].key);
+    });
+
+    context.read<SelectionModeProvider>().toggleSelectionMode(false);
+  }
+
   @override
   Widget build(BuildContext context) {
     // note database
     final noteDatabase = context.watch<NoteDatabase>();
-
-    // current notes
+    final isSelectionMode = context.watch<SelectionModeProvider>().isSelectionMode;
     List<Note> currentNotes = noteDatabase.currentNotes;
 
     return Scaffold(
@@ -77,9 +88,29 @@ class _NotesPageState extends State<NotesPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(onPressed: createNote, icon: const Icon(Icons.add),)
-        ],
+        actions: isSelectionMode
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () {
+                    context.read<SelectionModeProvider>().toggleSelectionMode(false);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    // Add logic to delete selected notes
+                    _deleteSelectedNotes();
+                    context.read<SelectionModeProvider>().toggleSelectionMode(false);
+                  },
+                ),
+              ]
+            : [
+                IconButton(
+                  onPressed: createNote,
+                  icon: const Icon(Icons.add),
+                ),
+              ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton(
@@ -106,23 +137,14 @@ class _NotesPageState extends State<NotesPage> {
           // LIST OF NOTES
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 20,),
-              child: ListView.builder(
-                itemCount: currentNotes.length,
-                itemBuilder: (context, index) {
-                  // Pobierz poszczególną notatkę
-                  final note = currentNotes[index];
-              
-                  // UI listy notatek
-                  return NoteTile(
-                    title: note.title,
-                    text: note.text,
-                    onEditPressed: () => updateNote(note),
-                    onDeletePressed: () =>
-                        deleteNote(note.key), // Używamy note.key zamiast note.id
-                    onTap: () => updateNote(note),
-                  );
-                },
+              padding: const EdgeInsets.only(
+                bottom: 20,
+              ),
+              child: NoteList(
+                notes: currentNotes,
+                onDeletePressed: (note) => deleteNote(note.key),
+                onEditPressed: (note) => updateNote(note),
+                onCancelPressed: (context) {},
               ),
             ),
           )
