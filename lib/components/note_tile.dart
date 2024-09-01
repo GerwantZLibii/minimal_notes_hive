@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:minimal_notes_hive/models/note.dart';
@@ -124,7 +126,8 @@ class NoteTile extends StatelessWidget {
           ),
           AnimatedOpacity(
             opacity: (isSelected || onCheckboxChanged != null) && isSelectionMode ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 100),
+            curve: const Interval(0.6, 1.0, curve: Curves.easeInOut),
             child: Padding(
               padding: const EdgeInsets.only(left: 10),
               child: Checkbox(

@@ -45,6 +45,7 @@ class _NoteListState extends State<NoteList> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      reverse: true,
       itemCount: widget.notes.length,
       itemBuilder: (context, index) {
         final note = widget.notes[index];

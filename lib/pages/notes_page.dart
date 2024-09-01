@@ -113,11 +113,6 @@ class _NotesPageState extends State<NotesPage> {
               ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-        onPressed: createNote,
-        child: const Icon(Icons.add),
-      ),
       drawer: const MyDrawer(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
